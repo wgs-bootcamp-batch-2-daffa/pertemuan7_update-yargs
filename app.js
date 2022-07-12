@@ -56,7 +56,7 @@ yargs.command({
 // DELETE CONTACT
 yargs.command({
     command: 'delete',
-    describe: 'detail contact',
+    describe: 'delete contact',
     builder: {
         name: {
             describe: 'contact name',
@@ -66,6 +66,15 @@ yargs.command({
     },
     handler(argv) {
         Contact.deleteContact(argv.name)
+    }
+})
+
+// DELETE CONTACT
+yargs.command({
+    command: 'delete_all',
+    describe: 'delete all contact',
+    handler() {
+        Contact.deleteAllContact()
     }
 })
 

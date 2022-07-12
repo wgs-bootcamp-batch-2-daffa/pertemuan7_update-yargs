@@ -73,8 +73,8 @@ const insertDataContacts = (Name, Email, Phone) => {
 
     // SUCCESS OUTPUT
     process.stdout.write('\033c');
-    console.log('<=== Input success ===>');
     detailContact(Name)
+    console.log('<=== Input success ===>');
 }
 // 
 // VIEW ALL CONTACT
@@ -114,11 +114,21 @@ const deleteContact = (input) => {
     const newContact = loadContact().filter(e => e.Name !== input)
     fs.writeFileSync('./data/contacts.json', JSON.stringify(newContact))
 }
+// 
+// DELETE CONTACT
+// 
+const deleteAllContact = () => {
+    process.stdout.write('\033c');
+    console.log('<=== Delete success ===>');
+
+    fs.writeFileSync('./data/contacts.json', '[]')
+}
 
 module.exports = {
     insertDataContacts,
     viewAllContact,
     detailContact,
-    deleteContact
+    deleteContact,
+    deleteAllContact
 }
 
