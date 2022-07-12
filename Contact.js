@@ -49,6 +49,9 @@ const validation = (email, phone) => {
     // Return output
     return true
 }
+// 
+// VALIDATOR DUPLICATE NAME
+// 
 const duplicateName = (input) => {
     // Return output
     return loadContact().find((e) => e.Name.toLowerCase() === input.toLowerCase())
