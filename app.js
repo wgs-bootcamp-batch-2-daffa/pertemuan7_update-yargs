@@ -1,6 +1,8 @@
+// 
+// All require modules
+// 
 const Contact = require('./Contact.js')
 const yargs = require('yargs')
-const { argv } = require('yargs')
 
 // INSERT NEW CONTACT
 yargs.command({
@@ -69,7 +71,7 @@ yargs.command({
     }
 })
 
-// DELETE CONTACT
+// DELETE ALL CONTACT
 yargs.command({
     command: 'delete_all',
     describe: 'delete all contact',
@@ -78,5 +80,42 @@ yargs.command({
     }
 })
 
+// UPDATE CONTACT
+yargs.command({
+    command: 'update',
+    describe: 'delete all contact',
+    builder: {
+        key: {
+            describe: 'key',
+            demandOption: false,
+            type: 'string'
+        },
+        name: {
+            describe: 'contact name',
+            demandOption: false,
+            type: 'string'
+        },
+        email: {
+            describe: 'contact email',
+            demandOption: false,
+            type: 'string'
+        },
+        mobile: {
+            describe: 'contact mobile',
+            demandOption: false,
+            type: 'string'
+        }
+    },
+    handler(argv) {
+        Contact.updateContact(
+            argv.key,
+            argv.name,
+            argv.email,
+            argv.mobile
+        )
+    }
+})
+
+// PARSE YARGS
 yargs.parse()
 

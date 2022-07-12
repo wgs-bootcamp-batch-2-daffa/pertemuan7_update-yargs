@@ -1,16 +1,19 @@
+// 
+// All require module
+// 
 const fs = require('fs')
 const validator = require('validator')
 // 
 // DATA CONTACT VALIDATOR FUNCTION
 // 
 const folderValidator = () => {
-    // VALIDATION FOLDER
+    // Validation folder
     const dirPath = './data'
     if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath)
     }
 
-    // VALIDATION FILE
+    // Validation file
     const dataPath = './data/contacts.json'
     if (!fs.existsSync(dataPath)) {
         fs.writeFileSync(dataPath, '[]')
@@ -20,58 +23,80 @@ const folderValidator = () => {
 // VALIDATOR INPUT
 // 
 const validation = (email, phone) => {
-    if (!validator.isEmail(email)) {
-        process.stdout.write('\033c');
-        console.log(`<=== Email isn't valid ===>`);
-        return false
+    // Check undefined email & null email
+    if (email !== undefined && email !== '') {
+        // Validator email
+        if (!validator.isEmail(email)) {
+            // Output
+            process.stdout.write('\033c');
+            console.log(`<=== Email isn't valid ===>`);
+
+            // Return output
+            return false
+        }
     }
+
+    // Validator phone
     if (!validator.isMobilePhone(phone, 'id-ID')) {
+        // Output
         process.stdout.write('\033c');
         console.log(`<=== Mobile phone isn't valid ===>`);
+
+        // Return output
         return false
     }
+
+    // Return output
     return true
 }
 const duplicateName = (input) => {
-    return loadContact().find((e) => e.Name == input)
+    // Return output
+    return loadContact().find((e) => e.Name.toLowerCase() === input.toLowerCase())
 }
 // 
 // LOAD CONTACT
 // 
 const loadContact = () => {
+    // Load data
     const file = fs.readFileSync('./data/contacts.json', 'utf8')
     const contacts = JSON.parse(file)
 
+    // Return output
     return contacts
 }
 // 
 // INSERT DATA CONTACTS
 // 
 const insertDataContacts = (Name, Email, Phone) => {
-    // VALIDATOR FOLDER JSON
+    // Validator folder json
     folderValidator()
 
-    // INITIAL DATA
+    // Initial data
     const dataContacts = loadContact()
-    const contact = { Name, Email, Phone }
 
+    // Check email input
+    let contact = { Name, Email, Phone }
+    if (Email === undefined) {
+        contact = { Name, Email: '', Phone }
+    }
+
+    // Check duplicate name
     if (duplicateName(Name)) {
         process.stdout.write('\033c');
         console.log('<=== Name already exists ===>');
         return
     }
 
-    // VALIDATOR EMAIL & PHONE
+    // Validator email & phone
     if (!validation(Email, Phone)) {
         return
     }
 
-    // INSERT DATA
+    // Insert data
     dataContacts.push(contact)
-
     fs.writeFileSync('./data/contacts.json', JSON.stringify(dataContacts))
 
-    // SUCCESS OUTPUT
+    // Success output
     process.stdout.write('\033c');
     detailContact(Name)
     console.log('<=== Input success ===>');
@@ -80,6 +105,7 @@ const insertDataContacts = (Name, Email, Phone) => {
 // VIEW ALL CONTACT
 // 
 const viewAllContact = () => {
+    // Output
     process.stdout.write('\033c');
     console.log('<=== All contacts ===>');
     loadContact().forEach((e, i) => {
@@ -90,45 +116,100 @@ const viewAllContact = () => {
 // DETAIL CONTACT
 // 
 const detailContact = (input) => {
-    process.stdout.write('\033c');
+    // Check name
     if (!duplicateName(input)) {
         console.log('<=== Name no exists ===>');
         return
     }
+
+    // Output
+    process.stdout.write('\033c');
     console.log('<=== Detail contact ===>');
     console.log(
         loadContact().find(e => e.Name == input)
     );
+
+    // Return data
+    return loadContact().find(e => e.Name == input)
 }
 // 
 // DELETE CONTACT
 // 
 const deleteContact = (input) => {
-    process.stdout.write('\033c');
+    // Check name
     if (!duplicateName(input)) {
         console.log('<=== Name no exists ===>');
         return
     }
+
+    // Success output
     detailContact(input)
     console.log('<=== Delete success ===>');
+
+    // Delete data
     const newContact = loadContact().filter(e => e.Name !== input)
     fs.writeFileSync('./data/contacts.json', JSON.stringify(newContact))
 }
 // 
-// DELETE CONTACT
+// DELETE ALL CONTACT
 // 
 const deleteAllContact = () => {
-    process.stdout.write('\033c');
-    console.log('<=== Delete success ===>');
-
+    // Delete all data
     fs.writeFileSync('./data/contacts.json', '[]')
-}
 
+    // Success output
+    process.stdout.write('\033c');
+    console.log('<=== All data are deleted ===>');
+}
+// 
+// UPDATE CONTACT
+// 
+const updateContact = (key, Name, Email, Phone) => {
+    // Check key
+    if (!duplicateName(key)) {
+        process.stdout.write('\033c');
+        console.log('<=== Key no exists ===>');
+        return
+    }
+
+    // Initial old data
+    const old = detailContact(key)
+
+    // Initial new data
+    let name
+    let email
+    let phone
+    (Name === undefined) ? name = old.Name : name = Name;
+    (Email === undefined) ? email = old.Email : email = Email;
+    (Phone === undefined) ? phone = old.Phone : phone = Phone;
+
+    // Check duplicate name
+    if (duplicateName(name)) {
+        process.stdout.write('\033c');
+        console.log('<=== Name already exists ===>');
+        return
+    }
+
+    // Delete old data
+    deleteContact(key)
+
+    // Insert new data
+    insertDataContacts(name, email, phone)
+
+    // Success output
+    detailContact(name)
+    console.log('\n<=== Before update ===>');
+    console.log(old);
+}
+// 
+// Export modules
+// 
 module.exports = {
     insertDataContacts,
     viewAllContact,
     detailContact,
     deleteContact,
-    deleteAllContact
+    deleteAllContact,
+    updateContact
 }
 
